@@ -17,5 +17,8 @@ A multi-threaded TCP connect scanner built with Python's standard library (socke
 - Exception handling with try/except for timeouts and resets
 - Detecting binary protocols with isprintable() and displaying raw bytes as hex
 
+## Banner
+Shows the shared spider signature on startup. `--no-banner` disables it; `NO_COLOR` makes it plain.
+
 ## Legal
 Only scan systems you own or are explicitly authorized to test. scanme.nmap.org permits light scanning by the Nmap project.
