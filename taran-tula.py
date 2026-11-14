@@ -4,16 +4,7 @@ import argparse
 import socket
 from concurrent.futures import ThreadPoolExecutor
 
-parser = argparse.ArgumentParser(description="taran-tula: threaded TCP port scanner")
-parser.add_argument("target", help="Hostname or IP to scan")
-parser.add_argument("-p", "--ports", default="1-1024", help="Port range, e.g. 1-1000")
-parser.add_argument("-t", "--timeout", type=float, default=1.0, help="Timeout in seconds")
-parser.add_argument("-w", "--workers", type=int, default=100, help="Number of threads")
-parser.add_argument("-b", "--banners", action="store_true", help="Grab service banners from open ports")
-args = parser.parse_args()
-
-start, end = args.ports.split("-")
-ports = range(int(start), int(end) + 1)
+from banner import print_banner
 
 def grab_banner(s):
     try:
@@ -45,7 +36,29 @@ def scan_port(port):
             print(f"Port {port} is OPEN")
     s.close()
 
-print(f"Scanning {args.target} ports {start}-{end}...")
-with ThreadPoolExecutor(max_workers=args.workers) as pool:
-    pool.map(scan_port, ports)
-print("Scan complete.")
+def main():
+    global args
+    parser = argparse.ArgumentParser(description="taran-tula: threaded TCP port scanner")
+    parser.add_argument("target", help="Hostname or IP to scan")
+    parser.add_argument("-p", "--ports", default="1-1024", help="Port range, e.g. 1-1000")
+    parser.add_argument("-t", "--timeout", type=float, default=1.0, help="Timeout in seconds")
+    parser.add_argument("-w", "--workers", type=int, default=100, help="Number of threads")
+    parser.add_argument("-b", "--banners", action="store_true", help="Grab service banners from open ports")
+    parser.add_argument("--no-banner", action="store_true", help="Skip the startup signature banner")
+    args = parser.parse_args()
+
+    if not args.no_banner:
+        print_banner("taran-tula", "port scanner")
+
+    start, end = args.ports.split("-")
+    ports = range(int(start), int(end) + 1)
+
+    print(f"Scanning {args.target} ports {start}-{end}...")
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        pool.map(scan_port, ports)
+    print("Scan complete.")
+
+
+if __name__ == "__main__":
+    main()
+
